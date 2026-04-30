@@ -9,16 +9,16 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 STREAMER_PRESETS = {
     "Custom (Use Textboxes Below)": "",
-    "IShowSpeed (IRL/Funny)": "ytsearch10:IShowSpeed best IRL funny moments 2025 -gameplay -gaming",
-    "Kai Cenat (IRL/Hype)": "ytsearch10:Kai Cenat best IRL stream moments 2025 -gameplay -gaming",
-    "xQc (IRL/Reactions)": "ytsearch10:xQc funniest IRL moments 2025 -gameplay -gaming",
-    "Tyler1 (IRL/Rage)": "ytsearch10:Tyler1 funniest IRL rage moments 2025 -gameplay -gaming",
-    "Jynxzi (IRL/Clips)": "ytsearch10:Jynxzi best IRL moments 2025 -gameplay -gaming",
-    "CaseOh (IRL/Funny)": "ytsearch10:CaseOh funniest IRL moments compilation 2025 -gameplay -gaming",
-    "Markiplier (IRL/Funny)": "ytsearch10:Markiplier best IRL funny moments 2025 -gameplay -gaming",
-    "CoryxKenshin (IRL/Funny)": "ytsearch10:CoryxKenshin funniest IRL moments 2025 -gameplay -gaming",
-    "PewDiePie (IRL/Funny)": "ytsearch10:PewDiePie funniest IRL moments 2025 -gameplay -gaming",
-    "DashieGames (IRL/Funny)": "ytsearch10:DashieGames best IRL funny moments 2025 -gameplay -gaming"
+    "IShowSpeed (IRL/Funny)": "ytsearch10:IShowSpeed best IRL funny moments after:2025-01-01 before:2025-12-31 -gameplay -gaming",
+    "Kai Cenat (IRL/Hype)": "ytsearch10:Kai Cenat best IRL stream moments after:2025-01-01 before:2025-12-31 -gameplay -gaming",
+    "xQc (IRL/Reactions)": "ytsearch10:xQc funniest IRL moments after:2025-01-01 before:2025-12-31 -gameplay -gaming",
+    "Tyler1 (IRL/Rage)": "ytsearch10:Tyler1 funniest IRL rage moments after:2025-01-01 before:2025-12-31 -gameplay -gaming",
+    "Jynxzi (IRL/Clips)": "ytsearch10:Jynxzi best IRL moments after:2025-01-01 before:2025-12-31 -gameplay -gaming",
+    "CaseOh (IRL/Funny)": "ytsearch10:CaseOh funniest IRL moments compilation after:2025-01-01 before:2025-12-31 -gameplay -gaming",
+    "Markiplier (IRL/Funny)": "ytsearch10:Markiplier best IRL funny moments after:2025-01-01 before:2025-12-31 -gameplay -gaming",
+    "CoryxKenshin (IRL/Funny)": "ytsearch10:CoryxKenshin funniest IRL moments after:2025-01-01 before:2025-12-31 -gameplay -gaming",
+    "PewDiePie (IRL/Funny)": "ytsearch10:PewDiePie funniest IRL moments after:2025-01-01 before:2025-12-31 -gameplay -gaming",
+    "DashieGames (IRL/Funny)": "ytsearch10:DashieGames best IRL funny moments after:2025-01-01 before:2025-12-31 -gameplay -gaming"
 }
 
 def get_bgm_options():
