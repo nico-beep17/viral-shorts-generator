@@ -9,16 +9,16 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 STREAMER_PRESETS = {
     "Custom (Use Textboxes Below)": "",
-    "IShowSpeed (Rage/Funny)": "ytsearch10:IShowSpeed best rage funny moments 2022",
-    "Kai Cenat (Hype/Funny)": "ytsearch10:Kai Cenat best stream highlights 2022",
-    "xQc (Rage/Reactions)": "ytsearch10:xQc funniest rage moments compilation",
-    "Tyler1 (Rage)": "ytsearch10:Tyler1 funniest rage moments classic",
-    "Jynxzi (Rage/Clips)": "ytsearch10:Jynxzi best rage moments Rainbow Six",
-    "CaseOh (Funny/Rage)": "ytsearch10:CaseOh funniest stream moments compilation",
-    "Markiplier (Jump Scares)": "ytsearch10:Markiplier best jump scares compilation",
-    "CoryxKenshin (Funny/Scary)": "ytsearch10:CoryxKenshin funniest horror jump scares",
-    "PewDiePie (Classic Funny)": "ytsearch10:PewDiePie funniest gaming moments classic",
-    "DashieGames (Rage/Funny)": "ytsearch10:DashieGames best funny rage compilation"
+    "IShowSpeed (IRL/Funny)": "ytsearch10:IShowSpeed best IRL funny moments 2025 -gameplay -gaming",
+    "Kai Cenat (IRL/Hype)": "ytsearch10:Kai Cenat best IRL stream moments 2025 -gameplay -gaming",
+    "xQc (IRL/Reactions)": "ytsearch10:xQc funniest IRL moments 2025 -gameplay -gaming",
+    "Tyler1 (IRL/Rage)": "ytsearch10:Tyler1 funniest IRL rage moments 2025 -gameplay -gaming",
+    "Jynxzi (IRL/Clips)": "ytsearch10:Jynxzi best IRL moments 2025 -gameplay -gaming",
+    "CaseOh (IRL/Funny)": "ytsearch10:CaseOh funniest IRL moments compilation 2025 -gameplay -gaming",
+    "Markiplier (IRL/Funny)": "ytsearch10:Markiplier best IRL funny moments 2025 -gameplay -gaming",
+    "CoryxKenshin (IRL/Funny)": "ytsearch10:CoryxKenshin funniest IRL moments 2025 -gameplay -gaming",
+    "PewDiePie (IRL/Funny)": "ytsearch10:PewDiePie funniest IRL moments 2025 -gameplay -gaming",
+    "DashieGames (IRL/Funny)": "ytsearch10:DashieGames best IRL funny moments 2025 -gameplay -gaming"
 }
 
 def get_bgm_options():
