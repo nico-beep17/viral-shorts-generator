@@ -91,7 +91,7 @@ def generate_video(streamer_preset, custom_url, custom_streamer_name, custom_hoo
     if yt_target and yt_target.strip() and yt_target != '""':
         logs += f"Downloading source video from {yt_target}...\n"
         yield None, None, None, None, None, None, None, None, None, None, logs
-        yt_cmd = f'"{sys.executable}" -m yt_dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" --playlist-random --max-downloads 1 {yt_target} -o "raw_anime.mp4" || true'
+        yt_cmd = f'"{sys.executable}" -m yt_dlp --merge-output-format mp4 -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" --playlist-random --max-downloads 1 {yt_target} -o "raw_video.%(ext)s"'
         process = subprocess.Popen(yt_cmd, shell=True, cwd=work_dir, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
         for line in process.stdout:
             logs += line
@@ -99,6 +99,14 @@ def generate_video(streamer_preset, custom_url, custom_streamer_name, custom_hoo
                 logs = "..." + logs[-5000:]
             yield None, None, None, None, None, None, None, None, None, None, logs
         process.wait()
+        
+        # Move the downloaded file
+        os.system(f"cd {work_dir} && mv raw_video.mp4 raw_anime.mp4 2>/dev/null || mv raw_video.* raw_anime.mp4 2>/dev/null || true")
+
+    if not os.path.exists(os.path.join(work_dir, "raw_anime.mp4")):
+        logs += "\n❌ ERROR: Failed to download the video. Please try a different URL or Streamer."
+        yield None, None, None, None, None, None, None, None, None, None, logs
+        return
         
     # 6. Build
     logs += "\nRunning Video Generation Pipeline (Processing Top 5 Ranked Clips)...\n"
@@ -117,8 +125,8 @@ def generate_video(streamer_preset, custom_url, custom_streamer_name, custom_hoo
                 logs = "..." + logs[-5000:]
             
             # Since the user wants real-time feedback, we can try to surface videos as they are created
-            mp4_files = sorted(glob.glob(os.path.join(work_dir, "outputs", "*.mp4")), key=os.path.getmtime, reverse=True)
-            jpg_files = sorted(glob.glob(os.path.join(work_dir, "outputs", "*.jpg")), key=os.path.getmtime, reverse=True)
+            mp4_files = sorted(glob.glob(os.path.join(work_dir, "outputs", f"{streamer_name.lower().replace(' ', '_')}*.mp4")), key=os.path.getmtime, reverse=True)
+            jpg_files = sorted(glob.glob(os.path.join(work_dir, "outputs", f"{streamer_name.lower().replace(' ', '_')}*.jpg")), key=os.path.getmtime, reverse=True)
             
             v1, t1, v2, t2, v3, t3, v4, t4, v5, t5 = None, None, None, None, None, None, None, None, None, None
             for f in mp4_files:
