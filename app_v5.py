@@ -3,6 +3,7 @@ import os
 import glob
 import shutil
 import subprocess
+import sys
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -90,7 +91,7 @@ def generate_video(streamer_preset, custom_url, custom_streamer_name, custom_hoo
     if yt_target and yt_target.strip() and yt_target != '""':
         logs += f"Downloading source video from {yt_target}...\n"
         yield None, None, None, None, None, None, None, None, None, None, logs
-        yt_cmd = f"yt-dlp --playlist-random --max-downloads 1 {yt_target} -o 'raw_video.%(ext)s' || true && mv raw_video.* raw_anime.mp4 2>/dev/null || true"
+        yt_cmd = f'"{sys.executable}" -m yt_dlp --playlist-random --max-downloads 1 {yt_target} -o "raw_video.%(ext)s" || true && mv raw_video.* raw_anime.mp4 2>/dev/null || true'
         process = subprocess.Popen(yt_cmd, shell=True, cwd=work_dir, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
         for line in process.stdout:
             logs += line
@@ -103,7 +104,9 @@ def generate_video(streamer_preset, custom_url, custom_streamer_name, custom_hoo
     logs += "\nRunning Video Generation Pipeline (Processing Top 5 Ranked Clips)...\n"
     yield None, None, None, None, None, None, None, None, None, None, logs
     build_cmd = f"bash src/build_short.sh"
-    process = subprocess.Popen(build_cmd, shell=True, cwd=work_dir, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    env = os.environ.copy()
+    env["PYTHON_EXE"] = sys.executable
+    process = subprocess.Popen(build_cmd, shell=True, cwd=work_dir, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, env=env)
     
     with open(os.path.join(work_dir, "debug_pipeline.log"), "w") as logf:
         for line in process.stdout:
