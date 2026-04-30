@@ -2,7 +2,7 @@
 set -e
 export PYTHONUNBUFFERED=1
 PYTHON_EXE=${PYTHON_EXE:-python3}
-STREAMER_NAME="Kai Cenat"
+STREAMER_NAME="SPEEEED"
 HOOK_TITLE="ITSKATCHII VLOG"
 PROJECT_SLUG=$(echo "$STREAMER_NAME" | tr '[:upper:]' '[:lower:]' | tr -d '[:punct:]' | tr ' ' '_')
 
