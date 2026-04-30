@@ -1,0 +1,43 @@
+# Logs
+*.log
+debug_pipeline.log
+
+# Video Outputs
+outputs/
+*.mp4
+*.mkv
+*.webm
+
+# Raw Data
+raw_anime.mp4
+raw_video.*
+raw_thumbnail.jpg
+final_thumbnail.jpg
+clip_fixed.mp4
+clip_panned.mp4
+main_normalized.mp4
+final_short_temp.mp4
+final_short.mp4
+montage.mp4
+montage_start.mp4
+montage_end.mp4
+montage_frames/
+temp_samples/
+
+# Audio
+temp_audio.wav
+montage_bgm.wav
+narration.wav
+assets/bgm/track_00002.mp3
+assets/bgm/track_00003.mp3
+
+# Text states
+clip_time*.txt
+climax_time.txt
+hook_title.txt
+cmd.txt
+*.concat
+
+# Python
+__pycache__/
+*.pyc

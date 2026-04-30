@@ -1,0 +1,122 @@
+#!/bin/bash
+set -e
+
+STREAMER_NAME="Kai Cenat"
+HOOK_TITLE="ITSKATCHII VLOG"
+PROJECT_SLUG=$(echo "$STREAMER_NAME" | tr '[:upper:]' '[:lower:]' | tr -d '[:punct:]' | tr ' ' '_')
+
+echo "1. Scanning for best non-vocal action sequence (AI Clipper)..."
+python3 src/auto_clipper.py
+
+NUM_CLIPS=5
+
+# Pre-select $NUM_CLIPS completely unique random BGMs so no two clips share the same music
+mapfile -t RANDOM_BGMS < <(find assets/bgm -type f -name "*.mp3" | shuf -n $NUM_CLIPS 2>/dev/null)
+
+for CLIP_NUM in $(seq 1 $NUM_CLIPS); do
+    if [ ! -f "clip_time_${CLIP_NUM}.txt" ]; then
+        continue
+    fi
+    CLIP_START=$(cat "clip_time_${CLIP_NUM}.txt")
+    echo "======================================================"
+    echo "PROCESSING RANK #$CLIP_NUM CLIMAX (Start: $CLIP_START)"
+    echo "======================================================"
+
+    echo "2. Clipping extracted sequence (50s) from $CLIP_START..."
+    ffmpeg -y -ss "$CLIP_START" -i raw_anime.mp4 -t 00:00:50 -c:v libx264 -preset ultrafast -crf 18 -c:a aac clip_fixed.mp4
+
+    echo "3. Analyzing Video (AI Director)..."
+    python3 src/auto_director.py
+
+    echo "4. Generating AI Voiceover..."
+    python3 src/gen_narration.py
+
+    echo "5. Generating Dynamic Captions..."
+    python3 src/gen_cmd.py
+
+    echo "6. Running AI Face Tracking (Human/Streamer)..."
+    python3 src/generate_pan.py
+
+    echo "7. Compositing Base Video with 1080x1440 Centered Overlay..."
+    BGM_INDEX=$((CLIP_NUM - 1))
+    BGM_FILE="${RANDOM_BGMS[$BGM_INDEX]}"
+    
+    if [ -z "$BGM_FILE" ]; then
+        echo "No BGM found! Using fallback bgm.mp3"
+        BGM_FILE="assets/bgm.mp3"
+    fi
+    echo "Selected BGM: $BGM_FILE"
+
+    if [ -f hook_title.txt ]; then
+        HOOK_TITLE=$(cat hook_title.txt | tr -d "'")
+        echo "Using Dynamic Hook Title: $HOOK_TITLE"
+    fi
+
+    HOOK_LEN=${#HOOK_TITLE}
+    if [ "$HOOK_LEN" -gt 18 ]; then
+        HOOK_FONT_SIZE=$(( 85 * 18 / HOOK_LEN ))
+        HOOK_BORDER=$(( 10 * 18 / HOOK_LEN ))
+    else
+        HOOK_FONT_SIZE=85
+        HOOK_BORDER=10
+    fi
+
+    # The layout is: Blurred background + Centered 1080x1440 clip + Dynamic Cmd Captions + Static Hook
+    ffmpeg -y -i clip_fixed.mp4 -i clip_panned.mp4 -i narration.wav -i "$BGM_FILE" -filter_complex "
+        [0:v]scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,boxblur=luma_radius=40:luma_power=5,eq=brightness=-0.1[bg];
+        [1:v]eq=saturation=1.2:contrast=1.1,unsharp=5:5:1.0:5:5:0.0[fg];
+        [bg][fg]overlay=0:(1920-1440)/2,vignette=PI/4,
+        sendcmd=f=cmd.txt,drawtext=text=' ':fontcolor=yellow:fontsize=72:borderw=7:bordercolor=black:shadowcolor=black:shadowx=5:shadowy=5:fontfile=/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf,
+        drawtext=text='${HOOK_TITLE}':fontcolor=white:fontsize=${HOOK_FONT_SIZE}:borderw=${HOOK_BORDER}:bordercolor=red:shadowcolor=black:shadowx=8:shadowy=8:x=(w-text_w)/2:y=300:fontfile=/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf,
+        drawtext=text='${STREAMER_NAME}':fontcolor=yellow:fontsize=56:borderw=5:bordercolor=black:shadowcolor=black:shadowx=3:shadowy=3:box=1:boxcolor=black@0.8:boxborderw=10:x=(w-text_w)/2:y=420:fontfile=/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf[vsub];
+        [vsub]drawtext=text='@openclips_ai':fontcolor=white@0.5:fontsize=48:x=(w-text_w)/2:y=1600:fontfile=/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf[vfinal];
+        [0:a]volume=0.8[a_main];
+        [2:a]volume=10.0[a_narr];
+        [3:a]volume=0.1,bass=g=5[a_music];
+        [a_main][a_narr][a_music]amix=inputs=3:duration=first:dropout_transition=2:normalize=0[aout]
+    " -map "[vfinal]" -map "[aout]" -c:v libx264 -preset fast -crf 18 -c:a aac -b:a 192k -threads 1 -shortest final_short_temp.mp4
+
+    echo "8. Generating 8-Second Beat-Sync Montage..."
+    python3 src/detect_beats.py "$BGM_FILE" clip_panned.mp4 montage.concat
+
+    # Montage is compiled directly from the rendered 60fps image sequence
+    ffmpeg -y -framerate 60 -i montage_frames/frame_%04d.jpg -i montage_bgm.wav -filter_complex "
+        [0:v]setsar=1:1,drawtext=text='@openclips_ai':fontcolor=white@0.5:fontsize=48:x=(w-text_w)/2:y=1600:fontfile=/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf[v]
+    " -map "[v]" -map 1:a -c:v libx264 -preset fast -crf 18 -pix_fmt yuv420p -r 60 -c:a aac -b:a 192k -shortest montage.mp4
+
+    echo "9. Stitching Looped Sequence (2s front, 6s back)..."
+    MONTAGE_DUR=$(ffprobe -i montage.mp4 -show_entries format=duration -v quiet -of csv="p=0")
+    START_TIME=$(echo "$MONTAGE_DUR - 2.0" | bc)
+
+    # montage_end.mp4 gets the last 2 seconds
+    ffmpeg -y -ss "$START_TIME" -i montage.mp4 -c copy montage_end.mp4
+    # montage_start.mp4 gets the first 6 seconds
+    ffmpeg -y -t "$START_TIME" -i montage.mp4 -c copy montage_start.mp4
+
+    echo "10. Final Assembly..."
+    ffmpeg -y -i final_short_temp.mp4 -vf "fps=60,setsar=1:1" -c:v libx264 -preset fast -crf 18 -c:a aac -b:a 192k main_normalized.mp4
+
+    # Final Stitch: [Last 2s] + [Main 50s] + [First 6s]
+    # This way, when the video loops on TikTok, the [First 6s] flows perfectly into the [Last 2s]!
+    ffmpeg -y -i montage_end.mp4 -i main_normalized.mp4 -i montage_start.mp4 -filter_complex "[0:v][0:a][1:v][1:a][2:v][2:a]concat=n=3:v=1:a=1[v][a]" -map "[v]" -map "[a]" -c:v libx264 -preset fast -crf 18 -pix_fmt yuv420p -c:a aac -b:a 192k final_short.mp4
+
+    FINAL_OUT="${PROJECT_SLUG}_Rank${CLIP_NUM}_$(date +%Y%m%d_%H%M%S).mp4"
+    mv final_short.mp4 "outputs/$FINAL_OUT"
+
+    echo "11. Generating High-Retention Thumbnail..."
+    CLIMAX_TIME="0"
+    if [ -f climax_time.txt ]; then
+        CLIMAX_TIME=$(cat climax_time.txt)
+    fi
+    ffmpeg -y -ss "$CLIMAX_TIME" -i main_normalized.mp4 -vframes 1 -q:v 2 raw_thumbnail.jpg
+    # Enhance the thumbnail to make it pop (Saturation, Contrast, Vignette)
+    ffmpeg -y -i raw_thumbnail.jpg -vf "eq=saturation=1.5:contrast=1.2,vignette=PI/4" final_thumbnail.jpg
+    THUMB_OUT="${PROJECT_SLUG}_Rank${CLIP_NUM}_$(date +%Y%m%d_%H%M%S).jpg"
+    mv final_thumbnail.jpg "outputs/$THUMB_OUT"
+
+    echo "Done! Rank #$CLIP_NUM video is saved as: outputs/$FINAL_OUT"
+    echo "Rank #$CLIP_NUM thumbnail saved as: outputs/$THUMB_OUT"
+    
+    # Clean up intermediate files so the next loop starts fresh
+    rm -f clip_time_${CLIP_NUM}.txt clip_fixed.mp4 clip_panned.mp4 main_normalized.mp4 final_short_temp.mp4 montage.mp4 montage_start.mp4 montage_end.mp4
+done
