@@ -9,16 +9,16 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 STREAMER_PRESETS = {
     "Custom (Use Textboxes Below)": "",
-    "IShowSpeed (Rage/Funny)": "ytsearch50:IShowSpeed best rage funny moments 2022",
-    "Kai Cenat (Hype/Funny)": "ytsearch50:Kai Cenat best stream highlights 2022",
-    "xQc (Rage/Reactions)": "ytsearch50:xQc funniest rage moments compilation",
-    "Tyler1 (Rage)": "ytsearch50:Tyler1 funniest rage moments classic",
-    "Jynxzi (Rage/Clips)": "ytsearch50:Jynxzi best rage moments Rainbow Six",
-    "CaseOh (Funny/Rage)": "ytsearch50:CaseOh funniest stream moments compilation",
-    "Markiplier (Jump Scares)": "ytsearch50:Markiplier best jump scares compilation",
-    "CoryxKenshin (Funny/Scary)": "ytsearch50:CoryxKenshin funniest horror jump scares",
-    "PewDiePie (Classic Funny)": "ytsearch50:PewDiePie funniest gaming moments classic",
-    "DashieGames (Rage/Funny)": "ytsearch50:DashieGames best funny rage compilation"
+    "IShowSpeed (Rage/Funny)": "ytsearch10:IShowSpeed best rage funny moments 2022",
+    "Kai Cenat (Hype/Funny)": "ytsearch10:Kai Cenat best stream highlights 2022",
+    "xQc (Rage/Reactions)": "ytsearch10:xQc funniest rage moments compilation",
+    "Tyler1 (Rage)": "ytsearch10:Tyler1 funniest rage moments classic",
+    "Jynxzi (Rage/Clips)": "ytsearch10:Jynxzi best rage moments Rainbow Six",
+    "CaseOh (Funny/Rage)": "ytsearch10:CaseOh funniest stream moments compilation",
+    "Markiplier (Jump Scares)": "ytsearch10:Markiplier best jump scares compilation",
+    "CoryxKenshin (Funny/Scary)": "ytsearch10:CoryxKenshin funniest horror jump scares",
+    "PewDiePie (Classic Funny)": "ytsearch10:PewDiePie funniest gaming moments classic",
+    "DashieGames (Rage/Funny)": "ytsearch10:DashieGames best funny rage compilation"
 }
 
 def get_bgm_options():
