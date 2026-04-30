@@ -1,12 +1,13 @@
 #!/bin/bash
 set -e
-
+export PYTHONUNBUFFERED=1
+PYTHON_EXE=${PYTHON_EXE:-python3}
 STREAMER_NAME="Kai Cenat"
 HOOK_TITLE="ITSKATCHII VLOG"
 PROJECT_SLUG=$(echo "$STREAMER_NAME" | tr '[:upper:]' '[:lower:]' | tr -d '[:punct:]' | tr ' ' '_')
 
 echo "1. Scanning for best non-vocal action sequence (AI Clipper)..."
-python3 src/auto_clipper.py
+"$PYTHON_EXE" src/auto_clipper.py
 
 NUM_CLIPS=5
 
@@ -26,16 +27,16 @@ for CLIP_NUM in $(seq 1 $NUM_CLIPS); do
     ffmpeg -y -ss "$CLIP_START" -i raw_anime.mp4 -t 00:00:50 -c:v libx264 -preset ultrafast -crf 18 -c:a aac clip_fixed.mp4
 
     echo "3. Analyzing Video (AI Director)..."
-    python3 src/auto_director.py
+    "$PYTHON_EXE" src/auto_director.py
 
     echo "4. Generating AI Voiceover..."
-    python3 src/gen_narration.py
+    "$PYTHON_EXE" src/gen_narration.py
 
     echo "5. Generating Dynamic Captions..."
-    python3 src/gen_cmd.py
+    "$PYTHON_EXE" src/gen_cmd.py
 
     echo "6. Running AI Face Tracking (Human/Streamer)..."
-    python3 src/generate_pan.py
+    "$PYTHON_EXE" src/generate_pan.py
 
     echo "7. Compositing Base Video with 1080x1440 Centered Overlay..."
     BGM_INDEX=$((CLIP_NUM - 1))
@@ -77,7 +78,7 @@ for CLIP_NUM in $(seq 1 $NUM_CLIPS); do
     " -map "[vfinal]" -map "[aout]" -c:v libx264 -preset fast -crf 18 -c:a aac -b:a 192k -threads 1 -shortest final_short_temp.mp4
 
     echo "8. Generating 8-Second Beat-Sync Montage..."
-    python3 src/detect_beats.py "$BGM_FILE" clip_panned.mp4 montage.concat
+    "$PYTHON_EXE" src/detect_beats.py "$BGM_FILE" clip_panned.mp4 montage.concat
 
     # Montage is compiled directly from the rendered 60fps image sequence
     ffmpeg -y -framerate 60 -i montage_frames/frame_%04d.jpg -i montage_bgm.wav -filter_complex "

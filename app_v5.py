@@ -91,7 +91,7 @@ def generate_video(streamer_preset, custom_url, custom_streamer_name, custom_hoo
     if yt_target and yt_target.strip() and yt_target != '""':
         logs += f"Downloading source video from {yt_target}...\n"
         yield None, None, None, None, None, None, None, None, None, None, logs
-        yt_cmd = f'"{sys.executable}" -m yt_dlp --playlist-random --max-downloads 1 {yt_target} -o "raw_video.%(ext)s" || true && mv raw_video.* raw_anime.mp4 2>/dev/null || true'
+        yt_cmd = f'"{sys.executable}" -m yt_dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" --playlist-random --max-downloads 1 {yt_target} -o "raw_anime.mp4" || true'
         process = subprocess.Popen(yt_cmd, shell=True, cwd=work_dir, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
         for line in process.stdout:
             logs += line
